@@ -1,0 +1,53 @@
+NOTE : If any name changes or region changes are required. Make sure to change the references in the script and policies accordingly. "" wil be used to highlight names
+NOTE : Port 587 is used by Gmail SMTP Server. Make sure to whitelist your server correctly
+
+Pre-requists: 
+1. Configured AWS Account
+2. us-east-1 region will be used (Or Script needs to be edited)
+
+Common:
+1. Update ssmtp.conf and revalaliases under both monitoring and webserver directory with your email username and password
+2. Create a config s3 bucket named "capital-market-config-bucket"
+
+Webserver
+1. Create a logging s3 bucket named as "capital-market-logging-bucket"
+2. Copy files under webserver directory to s3 bucket "s3://capital-market-config-bucket/webserver/"
+3. Create Key Pair with the name "keerthan-key" and download the key
+4. Create IAM Role using iam-policy.json file inside webserver directory. 
+5. Create Launch configuration. Make sure to follow below steps;
+    1. Use the above created keypair and IAM instance Role
+    2. Add webserver/userdata.sh files contents under Userdate in Launch configuration
+    3. Use Amazon Linux 2 AMI
+    4. Make sure to use a public subnet (Default VPC, Default Subnet works)
+    5. Allow Port 80 and 587 from anywhere in Security Group
+    6. (Optional) Allow Port 22 from your IP for debugging
+6. Create ASG from above created launch config
+    1. Create Internet Facing load balancer with ASG as the target for port 80
+7. Validation
+    1. SSH into the instance using the public ip and the downloaded key
+    2. Check if scripts are present under /etc/logging
+    3. Run script and check if the compressed log files are copied to S3
+    4. use crontab -l command and check if the crontab is present to run the script daily 
+    5. Use the Load Balancers DNS to make sure you can reach httpd server in instance
+    6. Script logs will be added to /var/log/cron.log
+
+Monitoring
+1. Copy files under monitoring directory to s3 bucket "s3://capital-market-config-bucket/monitoring/"
+2. Copy downloaded webserver key (Step: Webserver:3) to s3 bucket as "keerthan-key.pem" "s3://capital-market-config-bucket/monitoring/keerthan-key.pem"
+3. Create a DynamoDB table named as "webserver-monitoring" with primary key as "timestamp"
+4. Create a new keypair
+5. Create IAM Role using iam-policy.json file inside monitoring directory. 
+6. Create Launch configuration. Make sure to follow 
+    1. Use the above created keypair and IAM instance Role
+    2. Add monitoring/userdata.sh files contents under Userdate in Launch configuration
+    3. Use Amazon Linux 2 AMI
+    4. Make sure to use a public subnet (Default VPC, Default Subnet works)
+    5. Allow Port 587 from anywhere in Security Group
+    6. (Optional) Allow Port 22 from your IP for debugging
+7. Create ASG using created Launch Config
+8. Validation
+    1. SSH into the instance using the public ip and the downloaded key
+    2. Check if scripts are present under /etc/monitoring
+    3. Run script and check if result has been added to DynamoDB
+    4. use crontab -l command and check if the crontab is present to run the script Hourly
+    5. Script logs will be added to /var/log/cron.log

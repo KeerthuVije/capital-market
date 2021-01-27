@@ -1,0 +1,30 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingInstances",
+                "ec2:DescribeInstances",
+                "ec2:DescribeScheduledInstances",
+                "autoscaling:DescribeAutoScalingGroups",
+                "ec2:DescribeInstanceAttribute",
+                "ec2:DescribeInstanceStatus"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "dynamodb:PutItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:us-east-1:861710225209:table/webserver-monitoring",
+                "arn:aws:s3:::capital-market-config-bucket/monitoring/*"
+            ]
+        }
+    ]
+}

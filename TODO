@@ -1,0 +1,68 @@
+Basic Requirements
+
+1.Web-Server  (Q1,Q2,Q4)                                            ✅
+    1. Create S3 Log Bucket                                         ✅
+    2. Create IAM Role to give Access to S3                         ✅
+    3. Create Launch Configaration (UserData Script)                ✅
+        1. Update packages                                          ✅
+        2. Install httpd                                            ✅
+        3. Add hello world index html in /var/html/index.html       ✅
+        4. Configure Logs                                           ✅
+        5. Start Service                                            ✅
+        6. Enable Service                                           ✅
+        7. Create Script                                            ✅
+            1. Copy related Files                                   ✅
+            2. Compressed Copied Files                              ✅
+            3. Move to S3, delete compress if success               ✅
+            4. If fail email team                                   ✅
+            5. Configure as Daily Cron                              ✅
+    2. ASG with Launch Config (Only 1 instance)                     ✅
+        1. Configure health                                         ✅
+        2. Configure LB                                             ✅
+
+2. Cron Server (Q3)                                                 ✅
+    1. Create DynamoDB                                              ✅
+    2. Create IAM Role to give access to dynamoDB                   ✅
+    3. Create Launch Configaration (UserData Script)                ✅
+        1. Create Script                                            ✅ 
+            1. SSH and Check if server is running or run it         ✅
+            2. Curl and Check if Status 200                         ✅
+            3. Send Email if error (Use test email creds)           ✅
+            4. Save to Dynamo DB                                    ✅
+        2. Configure as Hourly Cron                                 ✅
+    4. ASG with Launch Config (Only 1 instance)                     ✅
+
+--------------------------------------------------------------------------------------------------
+Supplementary Requirements
+
+1. Automate this entire setup, so anyone can provision/destroy the setup using a single click of a button
+    I.You can use a suitable AWS or any cloud/virtual service or any other suitable tool/template to
+      automate infrastructure provisioning/destruction.
+    II.You can use any configuration management tool (such as Puppet, Chef or Ansible) to bootstrap the
+       server.
+       A. Didn't use any configuration management tools per se but have used a S3 config bucket along with Bash Scripts (Userdata) to be automated fully.
+
+2. Business requirement is to make the website available 9*5. Do the required to support this business requirement
+   without any manual intervention of Application Support team.
+   A. Added a Scheduled Scale Down policy under ASG
+   
+3. Ensure availability and reliability of this setup
+    A. Use an ASG, Launch Config with fully automated userdata scripts and Load Balancer to run health checks every 5 mins, incase any instance fails
+       the health check, it will be kicked out and replaced by a new instance
+    B. Tested all scripts vigorously to make sure its reliable
+    C. In order to make sure availability under load, added an ASG and divided traffic using a Load Balancer 
+	
+4. Ensure the solution is cost effective.
+    A. Used cheaper DynamoDB to store monitoring statuses
+    B. Used Spot Instances to reduce cost
+    C. Used Scheduled Scale Down when not needed to reduce cost
+    D. Used small instances 
+	
+5. Solution you suggest should be secure.
+    A. Used Encrypted S3 buckets to store Keys
+    B. Used Proper Security Group rules.
+    C. Access to SSH port is very limited using a Security Group
+    D. Created IAM roles for the instances, giving permission to the only required resources and actions
+	
+6. Containerize the solution
+	A. Didn't do this part
