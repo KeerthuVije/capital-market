@@ -2,7 +2,7 @@
 
 #Create name for the object to be stored in s3
 dateName=$(date -u +%Y-%m-%d)
-# Change to log script directory
+# Change to log script directory which was created in the userdata script
 cd /etc/logging/
 # Delete if already log directory is there. Redirect all output to /dev/null
 rm -rf logDir &> /dev/null
@@ -13,7 +13,7 @@ cp /var/log/httpd/* ./logDir/
 # Get Server Content
 curl localhost > ./logDir/content.html
 
-# Compress Collected log files and content
+# Compress Collected log files and content. Date name to create unique log files
 tar -cvzf "log-$dateName.tar.gz" ./logDir
 
 # Delete temp logDir Directory
