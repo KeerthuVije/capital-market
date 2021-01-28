@@ -12,7 +12,7 @@ EOF
 # DynamoDB Insert Array String start
 strJson="["
 # Get timestamp to be used as primary key
-timestamp=$(date -u +%Y-%m-%d-%h:%M:%s)
+timestamp=$(date -u +%Y-%m-%d:%H:%M:%S)
 
 # Get list of all instances in webserver-asg Autoscaling group
 for line in $(aws autoscaling describe-auto-scaling-groups --output json --region us-east-1 --auto-scaling-group-names webserver-asg | jq -c ".AutoScalingGroups | .[0] | .Instances | .[]")
